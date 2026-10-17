@@ -11,15 +11,35 @@ import Work from "./Work";
 import TechStackNew from "./TechStackNew";
 import CallToAction from "./CallToAction";
 import setSplitText from "./utils/splitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const MainContainer = () => {
   useEffect(() => {
-    const resizeHandler = () => {
-      setSplitText();
+    let cleanupTextAnimations = () => {};
+    let resizeTimer = 0;
+
+    const setupTextAnimations = () => {
+      cleanupTextAnimations();
+      cleanupTextAnimations = setSplitText();
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     };
-    resizeHandler();
+
+    const resizeHandler = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(setupTextAnimations, 200);
+    };
+
+    // Run once for normal navigation, then recalculate when the loader has
+    // unlocked scrolling and when the final web font metrics are available.
+    setupTextAnimations();
+    window.addEventListener("portfolio:ready", setupTextAnimations);
     window.addEventListener("resize", resizeHandler);
+    document.fonts?.ready.then(setupTextAnimations);
+
     return () => {
+      window.clearTimeout(resizeTimer);
+      cleanupTextAnimations();
+      window.removeEventListener("portfolio:ready", setupTextAnimations);
       window.removeEventListener("resize", resizeHandler);
     };
   }, []);

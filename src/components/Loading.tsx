@@ -14,7 +14,12 @@ const Loading = ({ percent }: { percent: number }) => {
     const exitAnimationTimer = window.setTimeout(() => setClicked(true), 3200);
     const finishTimer = window.setTimeout(() => {
       setIsLoading(false);
-      import("./utils/initialFX").then((module) => module.initialFX?.());
+      import("./utils/initialFX").then((module) => {
+        module.initialFX?.();
+        requestAnimationFrame(() => {
+          window.dispatchEvent(new Event("portfolio:ready"));
+        });
+      });
     }, 4000);
 
     return () => {

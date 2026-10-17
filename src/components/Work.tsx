@@ -10,8 +10,29 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Work = () => {
   useEffect(() => {
-    // Disable pinning on mobile to allow scrolling
-    if (window.innerWidth <= 1024) return;
+    // Use lightweight reveal animations on mobile; desktop keeps the
+    // horizontal pinned showcase.
+    if (window.innerWidth <= 1024) {
+      const mobileTweens = gsap.utils.toArray<HTMLElement>(".work-box").map((box) =>
+        gsap.fromTo(
+          box,
+          { autoAlpha: 0, y: 40 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: box,
+              start: "top 88%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        )
+      );
+
+      return () => mobileTweens.forEach((tween) => tween.kill());
+    }
 
     let translateX: number = 0;
 

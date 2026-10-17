@@ -11,11 +11,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function setSplitText() {
   ScrollTrigger.config({ ignoreMobileResize: true });
-  if (window.innerWidth < 900) return;
   const paras: NodeListOf<ParaElement> = document.querySelectorAll(".para");
   const titles: NodeListOf<ParaElement> = document.querySelectorAll(".title");
 
-  const TriggerStart = window.innerWidth <= 1024 ? "top 60%" : "20% 60%";
+  const isMobile = window.innerWidth < 900;
+  const TriggerStart = isMobile ? "top 88%" : window.innerWidth <= 1024 ? "top 70%" : "20% 60%";
   const ToggleAction = "play pause resume reverse";
 
   paras.forEach((para: ParaElement) => {
@@ -32,7 +32,7 @@ export default function setSplitText() {
 
     para.anim = gsap.fromTo(
       para.split.words,
-      { autoAlpha: 0, y: 80 },
+      { autoAlpha: 0, y: isMobile ? 32 : 80 },
       {
         autoAlpha: 1,
         scrollTrigger: {
@@ -40,7 +40,7 @@ export default function setSplitText() {
           toggleActions: ToggleAction,
           start: TriggerStart,
         },
-        duration: 1,
+        duration: isMobile ? 0.7 : 1,
         ease: "power3.out",
         y: 0,
         stagger: 0.02,
@@ -58,7 +58,7 @@ export default function setSplitText() {
     });
     title.anim = gsap.fromTo(
       title.split.chars,
-      { autoAlpha: 0, y: 80, rotate: 10 },
+      { autoAlpha: 0, y: isMobile ? 36 : 80, rotate: isMobile ? 4 : 10 },
       {
         autoAlpha: 1,
         scrollTrigger: {
@@ -66,7 +66,7 @@ export default function setSplitText() {
           toggleActions: ToggleAction,
           start: TriggerStart,
         },
-        duration: 0.8,
+        duration: isMobile ? 0.65 : 0.8,
         ease: "power2.inOut",
         y: 0,
         rotate: 0,
@@ -75,5 +75,18 @@ export default function setSplitText() {
     );
   });
 
-  ScrollTrigger.addEventListener("refresh", () => setSplitText());
+  return () => {
+    paras.forEach((para) => {
+      para.anim?.kill();
+      para.split?.revert();
+      delete para.anim;
+      delete para.split;
+    });
+    titles.forEach((title) => {
+      title.anim?.kill();
+      title.split?.revert();
+      delete title.anim;
+      delete title.split;
+    });
+  };
 }
