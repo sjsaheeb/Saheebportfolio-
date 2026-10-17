@@ -11,8 +11,10 @@
   background-color: #e6c3ff;
   box-shadow: 0px 0px 30px 0px rgb(175, 131, 255);
   mix-blend-mode: difference;
+  opacity: 0;
   transition: top 0.3s ease-out, left 0.3s ease-out, width 0.3s ease-out,
-    height 0.3s ease-out;
+    height 0.3s ease-out, opacity 0.25s ease-out;
+  will-change: transform, width, height, opacity;
 }
 .cursor-icons {
   top: 10px;
@@ -26,8 +28,23 @@
 @media only screen and (min-width: 600px) {
   .cursor-main {
     --size: 50px;
+    opacity: 1;
   }
   .cursor-disable {
     --size: 0px;
+  }
+}
+
+/* Touchscreens do not emit mousemove events. Show a smaller cursor while the
+   user touches or scrolls, then fade it away so it never blocks content. */
+@media (pointer: coarse) {
+  .cursor-main {
+    --size: 0px;
+    opacity: 0;
+  }
+
+  .cursor-main.cursor-touch-active {
+    --size: 36px;
+    opacity: 1;
   }
 }
