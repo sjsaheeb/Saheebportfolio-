@@ -10,6 +10,18 @@ export let lenis: Lenis | null = null;
 
 const Navbar = () => {
   useEffect(() => {
+    const useNativeScroll = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+    // Smooth-scroll interception can make touch scrolling feel locked on some
+    // mobile browsers. Keep the native browser scroll path on touch devices.
+    if (useNativeScroll) {
+      lenis?.destroy();
+      lenis = null;
+      document.body.style.overflowY = "auto";
+      document.documentElement.style.overflowY = "auto";
+      return;
+    }
+
     // Initialize Lenis smooth scroll
     lenis = new Lenis({
       duration: 1.7,

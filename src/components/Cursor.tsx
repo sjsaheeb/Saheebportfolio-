@@ -5,38 +5,21 @@ import gsap from "gsap";
 const Cursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const supportsMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!supportsMouse) return;
+
     let hover = false;
     const cursor = cursorRef.current!;
     const mousePos = { x: 0, y: 0 };
     const cursorPos = { x: 0, y: 0 };
     let animationFrame = 0;
-    let touchFadeTimer = 0;
 
-    const handlePointerMove = (e: PointerEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
       mousePos.x = e.clientX;
       mousePos.y = e.clientY;
-
-      if (e.pointerType === "touch" || e.pointerType === "pen") {
-        window.clearTimeout(touchFadeTimer);
-        cursor.classList.add("cursor-touch-active");
-        cursorPos.x = e.clientX;
-        cursorPos.y = e.clientY;
-        gsap.set(cursor, { x: cursorPos.x, y: cursorPos.y });
-      }
     };
 
-    const hideTouchCursor = (e: PointerEvent) => {
-      if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
-      window.clearTimeout(touchFadeTimer);
-      touchFadeTimer = window.setTimeout(() => {
-        cursor.classList.remove("cursor-touch-active");
-      }, 300);
-    };
-
-    document.addEventListener("pointermove", handlePointerMove, { passive: true });
-    document.addEventListener("pointerdown", handlePointerMove, { passive: true });
-    document.addEventListener("pointerup", hideTouchCursor, { passive: true });
-    document.addEventListener("pointercancel", hideTouchCursor, { passive: true });
+    document.addEventListener("mousemove", handleMouseMove, { passive: true });
 
     const loop = () => {
       if (!hover) {
@@ -82,12 +65,8 @@ const Cursor = () => {
     });
 
     return () => {
-      window.clearTimeout(touchFadeTimer);
       cancelAnimationFrame(animationFrame);
-      document.removeEventListener("pointermove", handlePointerMove);
-      document.removeEventListener("pointerdown", handlePointerMove);
-      document.removeEventListener("pointerup", hideTouchCursor);
-      document.removeEventListener("pointercancel", hideTouchCursor);
+      document.removeEventListener("mousemove", handleMouseMove);
       cursorItemCleanups.forEach((cleanup) => cleanup());
     };
   }, []);

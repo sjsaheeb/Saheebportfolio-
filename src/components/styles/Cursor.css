@@ -35,16 +35,9 @@
   }
 }
 
-/* Touchscreens do not emit mousemove events. Show a smaller cursor while the
-   user touches or scrolls, then fade it away so it never blocks content. */
-@media (pointer: coarse) {
+/* Phones and tablets use their native touch indicator and scrolling. */
+@media (hover: none), (pointer: coarse) {
   .cursor-main {
-    --size: 0px;
-    opacity: 0;
-  }
-
-  .cursor-main.cursor-touch-active {
-    --size: 36px;
-    opacity: 1;
+    display: none !important;
   }
 }
