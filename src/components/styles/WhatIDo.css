@@ -361,6 +361,13 @@
 }
 
 @media only screen and (max-width: 900px) {
+  /* The mobile text reveal is controlled by GSAP when this section enters
+     the viewport, rather than finishing behind the loading screen. */
+  .what-content-in {
+    opacity: 1;
+    animation: none;
+  }
+
   .whatIDO {
     flex-direction: column;
   }

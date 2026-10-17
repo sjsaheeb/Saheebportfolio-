@@ -1,14 +1,58 @@
 import { useEffect, useRef } from "react";
 import "./styles/WhatIDo.css";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "gsap";
 import { config } from "../config";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const WhatIDo = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<(HTMLDivElement | null)[]>([]);
   const setRef = (el: HTMLDivElement | null, index: number) => {
     containerRef.current[index] = el;
   };
   useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const mobileAnimation = window.matchMedia("(max-width: 900px)").matches
+      ? gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: "top 82%",
+              toggleActions: "play none none reverse",
+              invalidateOnRefresh: true,
+            },
+          })
+          .fromTo(
+            section.querySelector(".what-title"),
+            { autoAlpha: 0, y: 36, filter: "blur(5px)" },
+            {
+              autoAlpha: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: 0.7,
+              ease: "power3.out",
+            }
+          )
+          .fromTo(
+            section.querySelectorAll(
+              ".what-content h3, .what-content h4, .what-content p, .what-content h5, .what-tags"
+            ),
+            { autoAlpha: 0, y: 22 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.045,
+              ease: "power2.out",
+            },
+            "-=0.25"
+          )
+      : null;
+
     if (ScrollTrigger.isTouch) {
       containerRef.current.forEach((container) => {
         if (container) {
@@ -17,7 +61,11 @@ const WhatIDo = () => {
         }
       });
     }
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+
     return () => {
+      mobileAnimation?.scrollTrigger?.kill();
+      mobileAnimation?.kill();
       containerRef.current.forEach((container) => {
         if (container) {
           container.removeEventListener("click", () => handleClick(container));
@@ -26,7 +74,7 @@ const WhatIDo = () => {
     };
   }, []);
   return (
-    <div className="whatIDO">
+    <div className="whatIDO" ref={sectionRef}>
       <div className="what-box">
         <h2 className="what-title">
           W<span className="hat-h2">HAT</span>

@@ -46,6 +46,10 @@
   margin-right: 0.25em;
 }
 
+.about-me .split-char {
+  display: inline-block;
+}
+
 .about-me .split-line {
   display: block;
   text-align: center;
